@@ -33,6 +33,7 @@ class HuffmanTree {
 
         Nodo* raiz;
         std::unordered_map<char, std::string> codigoHuffman;
+        int bitsCodigo;
 
         /// @brief metodo privado para generar los codigos de Huffman
         /// @param raiz Nodo raiz del arbol
@@ -56,6 +57,11 @@ class HuffmanTree {
         /// @param codigo codigo de Huffman a decodificar
         /// @return texto decodificado
         std::string decodificar(std::string codigo);
+
+        /// @brief metodo para decodificar un codigo de Huffman guardado en un archivo .bin
+        /// @param codigo codigo de Huffman a decodificar 
+        /// @return texto decodificado 
+        std::string decodificarArchivo(std::string codigo);
 
 };
 

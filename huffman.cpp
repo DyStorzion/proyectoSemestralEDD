@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <iostream>
 #include "huffman.h"
+#include <fstream>
 
 void HuffmanTree::buildHuffmanTree(std::string texto) {
     codigoHuffman.clear();
@@ -65,8 +66,10 @@ void HuffmanTree::generarCodigos(Nodo* raiz, std::string codigo) {
 
 std::string HuffmanTree::codificar(std::string texto) {
     std::string codigo = "";
+    bitsCodigo = 0;
     for (char c : texto) {
         codigo += codigoHuffman[c];
+        bitsCodigo += codigoHuffman[c].size();
     }
     return codigo;
 }
@@ -93,4 +96,28 @@ std::string HuffmanTree::decodificar(std::string codigo) {
         }
     }
     return texto;
+}
+
+std::string HuffmanTree::decodificarArchivo(std::string nombreArchivo) {
+    std::ifstream inFile(nombreArchivo, std::ios::binary);
+    int bitsLeidos = 0;
+    if (!inFile.is_open()) {
+        std::cerr << "Error al abrir el archivo para leer.\n";
+        return "";
+    }
+
+    std::string codigoBinario = "";
+    char byte;
+    while (inFile.read(&byte, sizeof(char))) {
+        for (int i = 7; i >= 0; --i) {
+            bitsLeidos++;
+            if(bitsLeidos > bitsCodigo) break;
+            codigoBinario += ((byte >> i) & 1) ? '1' : '0';
+        }
+    }
+
+
+
+    inFile.close();
+        return decodificar(codigoBinario);
 }
