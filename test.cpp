@@ -1,4 +1,4 @@
-// Para la compilacion g++ test.cpp huffman.cpp -o test.out (o .exe para Windows)
+// Para la compilacion g++ test.cpp huffman.cpp lempelziv.cpp -o test.out (o .exe para Windows)
 // Para la ejecucion test.out <direccionArchivo.txt> (o test.exe para Windows)  
 
 #include <iostream>
@@ -6,6 +6,8 @@
 #include "huffman.h"
 #include <fstream>
 #include <chrono>
+#include <vector>
+#include "lempelziv.h"
 
 /// @brief metodo para guardar el codigo de Huffman en un archivo binario
 /// @param code codigo de Huffman a guardar
@@ -58,6 +60,7 @@ int main(int argc, char const *argv[])
     }
     archivoDeEntrada.close();
 
+    // Huffman
     HuffmanTree huffman;
     auto start = std::chrono::high_resolution_clock::now();
     huffman.buildHuffmanTree(texto);
@@ -66,7 +69,7 @@ int main(int argc, char const *argv[])
 
 
     // Muestra los codigos generados
-    huffman.mostrarCodigos();
+    //huffman.mostrarCodigos();
     start = std::chrono::high_resolution_clock::now();    
     std::string codigo = huffman.codificar(texto);
     end = std::chrono::high_resolution_clock::now();
@@ -80,7 +83,7 @@ int main(int argc, char const *argv[])
 
     double ahorroEspacio = 100 - ((double)(codigo.length() * 100) / (double)(texto.length()*8));
     double duracion = duration / 1000000.0;
-    std::cout << "\nCon la codificacion se ahorro un " <<  ahorroEspacio << "% de datos en bits y tardo " << duracion << "s" << std::endl; 
+    std::cout << "\nCon la codificacion de huffman se ahorro un " <<  ahorroEspacio << "% de datos en bits y tardo " << duracion << "s" << std::endl; 
 
     // Formato para el nombre del archivo sin datasets/ ni .txt
     std::string nombreArchivo = argv[1];
@@ -93,7 +96,35 @@ int main(int argc, char const *argv[])
 
     // Generar archivo de salida
     std::ofstream archivoDeSalida("resultados.csv", std::ios::app);
-    archivoDeSalida << nombreArchivo << ";" << ahorroEspacio << ";" << duracion << std::endl;
+    archivoDeSalida << "codificacion;" << nombreArchivo << ";" << ahorroEspacio << ";" << duracion << std::endl;
     archivoDeSalida.close();
 
+
+    // Lempel-Ziv
+    lempelziv lz;
+
+    start = std::chrono::high_resolution_clock::now();
+    std::vector<int> codigoLZ = lz.comprimir(texto);
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    //lz.mostrarCodigos();
+
+
+    size_t tamañoCodigoLZ = 0;
+    for (int codigo: codigoLZ) tamañoCodigoLZ += std::to_string(codigo).length() * 4;
+    //std::cout << "\nTexto comprimido con Lempel-Ziv(" << tamañoCodigoLZ << "bits):" << "\n";
+    //for (int codigo: codigoLZ) std::cout << codigo;
+
+    std::string decodificadoLZ = lz.descomprimir(codigoLZ);
+
+    ahorroEspacio = 100 - ((double)(tamañoCodigoLZ * 100) / (double)(texto.length()*8));
+    duracion = duration / 1000000.0;
+    //std::cout << "\n\nTexto descomprimido con Lempel-Ziv(" << decodificadoLZ.length() * 8 << "bits):" << "\n" << decodificadoLZ << std::endl;
+    std::cout << "\nCon la compresion de Lempel-Ziv se ahorro un " <<  ahorroEspacio << "% de datos en bits y tardo " << duracion << "s" << std::endl;
+
+    // Generar archivo de salida
+    archivoDeSalida.open("resultados.csv", std::ios::app);
+    archivoDeSalida << "compresion;" << nombreArchivo << ";" << ahorroEspacio << ";" << duracion << std::endl;
+    archivoDeSalida.close();
+    return 0;
 }
