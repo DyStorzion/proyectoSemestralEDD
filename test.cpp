@@ -7,6 +7,38 @@
 #include <fstream>
 #include <chrono>
 
+/// @brief metodo para guardar el codigo de Huffman en un archivo binario
+/// @param code codigo de Huffman a guardar
+/// @param filename nombre del archivo donde se guardara el codigo (debe tener extension .bin)
+void saveHuffmanCode(const std::string code, const std::string& filename) {
+    std::ofstream outFile(filename, std::ios::binary);
+    if (outFile.is_open()) {
+        char buffer = 0; // Buffer para almacenar los bits
+        int count = 0; // Contador de bits escritos en el buffer
+
+        for (char c : code) {
+            buffer = (buffer << 1) | (c - '0'); // Desplazar el buffer y agregar el nuevo bit
+            count++;
+
+            if (count == 8) { // Si el buffer está lleno, escribirlo en el archivo
+                outFile.write(&buffer, sizeof(char));
+                buffer = 0; // Reiniciar el buffer
+                count = 0;
+            }
+        }
+
+        // Si hay bits restantes en el buffer, escribirlos
+        if (count > 0) {
+            buffer <<= (8 - count);
+            outFile.write(&buffer, sizeof(char));
+        }
+
+        outFile.close();
+    } else {
+        std::cerr << "Error al abrir el archivo para escribir.\n";
+    }
+}
+
 int main(int argc, char const *argv[])
 {
     if(argc < 2) {
@@ -40,9 +72,10 @@ int main(int argc, char const *argv[])
     end = std::chrono::high_resolution_clock::now();
     duration += std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
     
+    saveHuffmanCode(codigo, "codificado.bin");
     //std::cout << "\nTexto codificado(" << codigo.length() << "bits):" << "\n" << codigo << std::endl;
 
-    std::string decodificado = huffman.decodificar(codigo);
+    std::string decodificado = huffman.decodificarArchivo("codificado.bin");
     //std::cout << "\nTexto decodificado(" << decodificado.length() * 8 << "bits):" << "\n" << decodificado << std::endl;
 
     double ahorroEspacio = 100 - ((double)(codigo.length() * 100) / (double)(texto.length()*8));
