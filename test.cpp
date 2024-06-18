@@ -69,21 +69,17 @@ int main(int argc, char const *argv[])
 
 
     // Muestra los codigos generados
-    //huffman.mostrarCodigos();
     start = std::chrono::high_resolution_clock::now();    
     std::string codigo = huffman.codificar(texto);
     end = std::chrono::high_resolution_clock::now();
     duration += std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
     
     saveHuffmanCode(codigo, "codificado.bin");
-    //std::cout << "\nTexto codificado(" << codigo.length() << "bits):" << "\n" << codigo << std::endl;
 
     std::string decodificado = huffman.decodificarArchivo("codificado.bin");
-    //std::cout << "\nTexto decodificado(" << decodificado.length() * 8 << "bits):" << "\n" << decodificado << std::endl;
 
     double ahorroEspacio = 100 - ((double)(codigo.length() * 100) / (double)(texto.length()*8));
     double duracion = duration / 1000000.0;
-    std::cout << "\nCon la codificacion de huffman se ahorro un " <<  ahorroEspacio << "% de datos en bits y tardo " << duracion << "s" << std::endl; 
 
     // Formato para el nombre del archivo sin datasets/ ni .txt
     std::string nombreArchivo = argv[1];
@@ -95,7 +91,7 @@ int main(int argc, char const *argv[])
     if(posicion != std::string::npos) nombreArchivo.erase(posicion, remover.length());
 
     // Generar archivo de salida
-    std::ofstream archivoDeSalida("resultados.csv", std::ios::app);
+    std::ofstream archivoDeSalida("resultadosHuffman.csv", std::ios::app);
     archivoDeSalida << "codificacion;" << nombreArchivo << ";" << ahorroEspacio << ";" << duracion << std::endl;
     archivoDeSalida.close();
 
@@ -107,23 +103,17 @@ int main(int argc, char const *argv[])
     std::vector<int> codigoLZ = lz.comprimir(texto);
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-    //lz.mostrarCodigos();
-
 
     size_t tamañoCodigoLZ = 0;
     for (int codigo: codigoLZ) tamañoCodigoLZ += std::to_string(codigo).length() * 4;
-    //std::cout << "\nTexto comprimido con Lempel-Ziv(" << tamañoCodigoLZ << "bits):" << "\n";
-    //for (int codigo: codigoLZ) std::cout << codigo;
 
     std::string decodificadoLZ = lz.descomprimir(codigoLZ);
 
     ahorroEspacio = 100 - ((double)(tamañoCodigoLZ * 100) / (double)(texto.length()*8));
     duracion = duration / 1000000.0;
-    //std::cout << "\n\nTexto descomprimido con Lempel-Ziv(" << decodificadoLZ.length() * 8 << "bits):" << "\n" << decodificadoLZ << std::endl;
-    std::cout << "\nCon la compresion de Lempel-Ziv se ahorro un " <<  ahorroEspacio << "% de datos en bits y tardo " << duracion << "s" << std::endl;
 
     // Generar archivo de salida
-    archivoDeSalida.open("resultados.csv", std::ios::app);
+    archivoDeSalida.open("resultadosLempelZiv.csv", std::ios::app);
     archivoDeSalida << "compresion;" << nombreArchivo << ";" << ahorroEspacio << ";" << duracion << std::endl;
     archivoDeSalida.close();
     return 0;
