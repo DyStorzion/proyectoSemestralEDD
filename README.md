@@ -1,9 +1,9 @@
 # Proyecto semestral de Estructura de datos
 
 ## Nombre integrantes del grupo
-- Benjamin Alonso Espinoza Henriquez
-- Sofia Ignacia Lopez Aguilera
-- Nicolas Francisco Alexis Lopez Cid
+- Benjamin Alonso Espinoza Henriquez (DyStorzion)
+- Sofia Ignacia Lopez Aguilera (lulunkaii)
+- Nicolas Francisco Alexis Lopez Cid (Nikolexion)
 ---
 ## Instrucciones para la ejecucion
 Si se desea probar la experimentación en su dispositivo en Windows, se dispone en este proyecto un 
