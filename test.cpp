@@ -75,17 +75,24 @@ int main(int argc, char const *argv[])
     duration += std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
     
     saveHuffmanCode(codigo, "codificado.bin");
+    // Decodificacion
 
+    start = std::chrono::high_resolution_clock::now();    
     std::string decodificado = huffman.decodificarArchivo("codificado.bin");
+    end = std::chrono::high_resolution_clock::now();
+    auto durationDecode = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
 
     double ahorroEspacio = 100 - ((double)(codigo.length() * 100) / (double)(texto.length()*8));
     double duracion = duration / 1000000.0;
-
+    double duracionDecode = durationDecode / 1000000.0;
+    
     // Formato para el nombre del archivo sin datasets/ ni .txt
     std::string nombreArchivo = argv[1];
-    std::string remover = "datasets/";
+    std::string remover = "datasets\\"; // Cambiar por datasets/ en Linux
     size_t posicion = nombreArchivo.find(remover);
-    if(posicion != std::string::npos) nombreArchivo.erase(posicion, remover.length());
+    if(posicion != std::string::npos) {
+        nombreArchivo = nombreArchivo.substr(posicion + remover.length());
+    }
     remover = ".txt";
     posicion = nombreArchivo.find(remover);
     if(posicion != std::string::npos) nombreArchivo.erase(posicion, remover.length());
@@ -93,6 +100,7 @@ int main(int argc, char const *argv[])
     // Generar archivo de salida
     std::ofstream archivoDeSalida("resultadosHuffman.csv", std::ios::app);
     archivoDeSalida << "codificacion;" << nombreArchivo << ";" << ahorroEspacio << ";" << duracion << std::endl;
+    archivoDeSalida << "decodificacion" << nombreArchivo << ";" << duracionDecode << std::endl;
     archivoDeSalida.close();
 
 
@@ -102,19 +110,24 @@ int main(int argc, char const *argv[])
     start = std::chrono::high_resolution_clock::now();
     std::vector<int> codigoLZ = lz.comprimir(texto);
     end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    auto durationLZ = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
     size_t tamañoCodigoLZ = 0;
     for (int codigo: codigoLZ) tamañoCodigoLZ += std::to_string(codigo).length() * 4;
 
+    start = std::chrono::high_resolution_clock::now();
     std::string decodificadoLZ = lz.descomprimir(codigoLZ);
+    end = std::chrono::high_resolution_clock::now();
+    auto durationDescomprimir = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
     ahorroEspacio = 100 - ((double)(tamañoCodigoLZ * 100) / (double)(texto.length()*8));
-    duracion = duration / 1000000.0;
+    long double duracionLZ = durationLZ / 1000000.0;
+    auto duracionDescomprimir = durationDescomprimir / 1000000.0;
 
     // Generar archivo de salida
     archivoDeSalida.open("resultadosLempelZiv.csv", std::ios::app);
-    archivoDeSalida << "compresion;" << nombreArchivo << ";" << ahorroEspacio << ";" << duracion << std::endl;
+    archivoDeSalida << "compresion;" << nombreArchivo << ";" << ahorroEspacio << ";" << duracionLZ << std::endl;
+    archivoDeSalida << "descompresion;" << nombreArchivo << ";" << duracionDescomprimir << std::endl;
     archivoDeSalida.close();
     return 0;
 }
